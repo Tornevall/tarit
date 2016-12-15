@@ -21,7 +21,7 @@ extension="gz"
 fi
 
 urar="x"
-uzip="-d ."
+xuzip="-d ."
 utgz="zvxf"
 utxz="Jvxf"
 ubz2="jvxf"
