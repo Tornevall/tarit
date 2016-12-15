@@ -1,6 +1,6 @@
 # tarit - the lazy-user helper for automatically tar and compress directories
 
-## What this script does
+## What this script do
 
 First of all, I will be very surprised if this was not yet another inventing-the-wheel-again tool.
 This script was once created as we worked a lot with tar archiving that required not only taring down directory structures.
