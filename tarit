@@ -28,40 +28,44 @@ fi
 
 if [ "" = "$1" ] ; then
 echo "Usage: tarit directory"
-exit;
+exit
 fi
 
+unslashed=$1
 slashed=`echo $1 | grep "/"`
 
 if [ "" != "$slashed" ] ; then
-echo "Directory names must not contain slashes"
-exit
+unslashed=`echo $1 | sed 's/\/$//'`
+echo "Directory names must not contain trailing slashes. So we are going to strip it."
+echo "Result: $slashed => $unslashed"
 fi
 
 echo "Selected archiver: $preferred (Params: $params)"
 
-if [ -d $1 ] ; then
+if [ -d $unslashed ] ; then
+	packed="${unslashed}.tar.$extension"
+	echo "Archive: ${unslashed}.tar (Directory ${unslashed})"
+	echo "Compress: $preferred $params ${unslashed}.tar"
 
-packed="$1.tar.$extension"
+	if [ -f $packed ] ; then
+		echo "Compressed destination, $packed, already exists. Aborting."
+		exit
+	fi
 
-echo "Archive: $1.tar (Directory $1)"
-echo "Compress: $preferred $params $1.tar"
+	echo "Calculating size of directory"
+	dirsize=`du -h $unslashed | tail -1 | awk '{printf \$1}'`
+	echo "Directory size: $dirsize"
 
-if [ -f $packed ] ; then
-echo "Compressed destination, $packed, already exists. Aborting."
-exit
-fi
+	echo "Creating tar archive"
+	tar cf $unslashed.tar $unslashed
+	$preferred $params $unslashed.tar
 
-echo "Creating tar archive"
-tar cf $1.tar $1
-$preferred $params $1.tar
-
-if [ -f $packed ] ; then
-echo "Compressed archive, $packed, seems to be created. Finalize by removal!"
-rm -rf $1
-echo "Done."
-fi
+	if [ -f $packed ] ; then
+		echo "Compressed archive, $packed, seems to be created. Finalize by removal!"
+		rm -rf $unslashed
+		echo "Done."
+	fi
 
 else
-echo "Can not archive unexistent archives"
+	echo "Can not archive unexistent archives"
 fi
