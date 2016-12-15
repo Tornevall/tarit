@@ -30,23 +30,23 @@ utar="--list --file"
 packonly="0"
 
 if [ "" = "$preferred" ] ; then
-echo "Proper archiver not found"
-exit
+	echo "Proper archiver not found"
+	exit
 fi
 
 
 if [ "" = "$1" ] ; then
-echo "Usage: tarit directory"
-exit
+	echo "Usage: tarit directory"
+	exit
 fi
 
 unslashed=$1
 slashed=`echo $1 | grep "/"`
 
 if [ "" != "$slashed" ] ; then
-unslashed=`echo $1 | sed 's/\/$//'`
-echo "Directory names must not contain trailing slashes. So we are going to strip it."
-echo "Result: $slashed => $unslashed"
+	unslashed=`echo $1 | sed 's/\/$//'`
+	echo "Directory names must not contain trailing slashes. So we are going to strip it."
+	echo "Result: $slashed => $unslashed"
 fi
 
 echo "Selected archiver: $preferred (Params: $params)"
@@ -67,6 +67,12 @@ if [ -d $unslashed ] ; then
 
 	echo "Creating tar archive"
 	tar cf $unslashed.tar $unslashed
+
+	if [ "$?" != "0" ] ; then
+		echo "Something failed during the tar session. I will not continue."
+		exit
+	fi
+
 	$preferred $params $unslashed.tar
 
 	if [ -f $packed ] ; then
@@ -76,7 +82,6 @@ if [ -d $unslashed ] ; then
 	fi
 
 else
-	#echo "Can not archive unexistent archives"
 	if [ -f $unslashed ] ; then
 		allowedExtensions="zip:unzip rar:rar tgz:tar tar:tar txz:tar tbz:tar tbz2:tar"
 		fileArchive=""
@@ -122,10 +127,20 @@ else
 				doExtract="$filePacker $extractCmd ../$unExtend.$currentExtension"
 				echo $doExtract
 				$doExtract
+				if [ "$?" != "0" ] ; then
+					echo "The extracting archiver gave me an errorcode ($?) that made me stop the process"
+					exit
+				fi
 				echo "Calculating size of directory"
 				dirsize=`du -h . | tail -1 | awk '{printf \$1}'`
-				echo "Directory size: $dirsize"
+				echo "Directory size: $dirsize - beginning the tar session"
 				tar cf ../$tarArchive .
+
+				if [ "$?" != "0" ] ; then
+					echo "The tar archiving process failed to succeed. Packing process aborted."
+					exit
+				fi
+
 				cd ..
 				echo "Compress: $preferred $params $tarArchive"
 				if [ -f $tarArchive ] && [ ! -f $tarArchive.$extension ] ; then
