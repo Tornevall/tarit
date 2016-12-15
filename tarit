@@ -1,0 +1,67 @@
+#!/bin/sh
+
+xz=`which xz`
+bz=`which bzip2`
+gz=`which gzip`
+
+preferred=$xz
+params="-ev"
+extension="xz"
+
+if [ "" = "$preferred" ] ; then
+preferred=$bz
+params="-v9"
+extension="bz2"
+fi
+
+if [ "" = "$preferred" ] ; then
+preferred=$gz
+params="-v9"
+extension="gz"
+fi
+
+if [ "" = "$preferred" ] ; then
+echo "Proper archiver not found"
+exit
+fi
+
+
+if [ "" = "$1" ] ; then
+echo "Usage: tarit directory"
+exit;
+fi
+
+slashed=`echo $1 | grep "/"`
+
+if [ "" != "$slashed" ] ; then
+echo "Directory names must not contain slashes"
+exit
+fi
+
+echo "Selected archiver: $preferred (Params: $params)"
+
+if [ -d $1 ] ; then
+
+packed="$1.tar.$extension"
+
+echo "Archive: $1.tar (Directory $1)"
+echo "Compress: $preferred $params $1.tar"
+
+if [ -f $packed ] ; then
+echo "Compressed destination, $packed, already exists. Aborting."
+exit
+fi
+
+echo "Creating tar archive"
+tar cf $1.tar $1
+$preferred $params $1.tar
+
+if [ -f $packed ] ; then
+echo "Compressed archive, $packed, seems to be created. Finalize by removal!"
+rm -rf $1
+echo "Done."
+fi
+
+else
+echo "Can not archive unexistent archives"
+fi
