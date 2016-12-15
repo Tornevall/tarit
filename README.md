@@ -1,4 +1,4 @@
-# tarit - the lazy user's tar-archiver-helper
+# tarit - the lazy-user helper for automatically tar and compress directories
 
 ## What this script does
 
@@ -10,7 +10,7 @@ There was also a big need of packing them with an available archiver. So what th
 * Tar the directory
 * Pack it with best available packer: gzip, bzip2 or xz. If xz exists, it will use that archiver and pack the tar archive with the -e(xtreme compression) flag.
 
-For a few weeks ago, this script also repacks archives and is currently supporting rar and zip-archives. What it does then is this:
+For a few weeks ago, this script also repacks archives this is not already tared and is currently supporting rar and zip-archives. What it does then is this:
 
 * Unpack the primary file archive (and calculate the unpacked folder size)
 * Tar the directory that was just extracted
@@ -18,3 +18,13 @@ For a few weeks ago, this script also repacks archives and is currently supporti
 
 If the archive already exists as a xz/gz/bz2-file, it tries to recompress the file with best available compression.
 And if the archive is only named "tar", yes - it tries to compress that file.
+
+
+## Supported archives (if unpackers exists)
+
+* rar
+* zip
+* bz2
+* gz
+* xz (Figures!)
+
