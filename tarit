@@ -20,6 +20,15 @@ params="-v9"
 extension="gz"
 fi
 
+urar="x"
+uzip="-d ."
+utgz="zvxf"
+utxz="Jvxf"
+ubz2="jvxf"
+ubz="jvxf"
+utar="--list --file"
+packonly="0"
+
 if [ "" = "$preferred" ] ; then
 echo "Proper archiver not found"
 exit
@@ -67,5 +76,74 @@ if [ -d $unslashed ] ; then
 	fi
 
 else
-	echo "Can not archive unexistent archives"
+	#echo "Can not archive unexistent archives"
+	if [ -f $unslashed ] ; then
+		allowedExtensions="zip:unzip rar:rar tgz:tar tar:tar txz:tar tbz:tar tbz2:tar"
+		fileArchive=""
+		filePacker=""
+		extractCmd=""
+		hasAllowed="0"
+		currentExtension=""
+		for ext in $allowedExtensions
+		do
+			testExtension=`echo $ext | cut -d ':' -f1`
+			testPacker=`echo $ext | cut -d ':' -f2`
+			allowedFile=`echo $unslashed | grep "$testExtension\$"`
+			if [ "$allowedFile" != "" ] ; then
+				hasAllowed="1"
+				eval "extractCmd=\$u$testExtension"
+				if [ "$extractCmd" = "" ] ; then
+					echo "No prepared extractor found for $testExtension"
+					exit
+				fi
+				currentExtension=$testExtension
+				filePacker=`which $testPacker`
+				echo "$unslashed format is $testExtension, archiver set to $filePacker"
+			fi
+		done
+		if [ "$hasAllowed" = "0" ] ; then
+			echo "This is a file is unsupported"
+			exit
+		fi
+
+		if [ "$filePacker" != "" ] && [ -f $filePacker ] && [ "$currentExtension" != "" ] ; then
+			unExtend=`echo $unslashed | sed "s/\.$currentExtension$//g"`
+			tarArchive="$unExtend.tar";
+			tarFolder="$tarArchive.\$tmp\$"
+			echo "RePack $unExtend(.$currentExtension) => $tarArchive ($tarFolder)"
+			if [ -d $tarFolder ] ; then
+				echo "Cleaning up"
+				rm -rfv $tarFolder
+			fi
+			if [ ! -d $tarFolder ] && [ ! -f $tarArchive ] && [ ! -f $tarArchive.$extension ] ; then
+				mkdir $tarFolder
+				echo "Creating $tarFolder"
+				cd $tarFolder
+				doExtract="$filePacker $extractCmd ../$unExtend.$currentExtension"
+				echo $doExtract
+				$doExtract
+				tar cf ../$tarArchive .
+				cd ..
+				echo "Compress: $preferred $params $tarArchive"
+				if [ -f $tarArchive ] && [ ! -f $tarArchive.$extension ] ; then
+					rm -rf $tarFolder
+					$preferred $params $tarArchive
+					echo "Comparision:"
+					ls -l $unExtend.*
+					echo "Cleaning up"
+					rm -v $unExtend.$currentExtension
+				fi
+			else
+				echo "$tarArchive (or the packed one) already exists in this folder."
+				echo "As it may be another archive than the one you would like to create, I have bailed out."
+				if [ -f $tarArchive ] && [ ! -f $tarArchive.$extension ]; then
+					echo "I will however pack this one for you, since there are no archived file present"
+					echo $preferred $params $tarArchive
+					$preferred $params $tarArchive
+				fi
+			fi
+		else
+			echo "This is a file is unsupported"
+		fi
+	fi
 fi
