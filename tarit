@@ -122,6 +122,9 @@ else
 				doExtract="$filePacker $extractCmd ../$unExtend.$currentExtension"
 				echo $doExtract
 				$doExtract
+				echo "Calculating size of directory"
+				dirsize=`du -h . | tail -1 | awk '{printf \$1}'`
+				echo "Directory size: $dirsize"
 				tar cf ../$tarArchive .
 				cd ..
 				echo "Compress: $preferred $params $tarArchive"
