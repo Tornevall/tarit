@@ -1,4 +1,4 @@
-# tarit - the lazy-user helper for automatically tar and compress directories
+# TarIT 1.0.4 - the lazy-user helper for automatically tar and compress directories
 
 ## What this script do
 
