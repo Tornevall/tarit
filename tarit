@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# TarIT version 1.0.4
+# Tomas Tornevall - thorne@tornevall.net
+# https://bitbucket.tornevall.net/projects/MISC/repos/tarit/browse
+#
+
 xz=`which xz`
 bz=`which bzip2`
 gz=`which gzip`
