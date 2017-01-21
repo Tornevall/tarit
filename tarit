@@ -124,7 +124,7 @@ else
 				echo "Creating $tarFolder"
 				mkdir $tarFolder
 				# Make sure it actually worked
-				if [ -d $tarFolder] ; then
+				if [ -d $tarFolder ] ; then
 					cd $tarFolder
 					doExtract="$filePacker $extractCmd ../$unExtend.$currentExtension"
 					echo $doExtract
