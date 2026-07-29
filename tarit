@@ -56,7 +56,7 @@ fi
 
 echo "Selected archiver: $preferred (Params: $params)"
 
-if [ -d $unslashed ] ; then
+if [ -d "$unslashed" ] ; then
 	packed="${unslashed}.tar.$extension"
 	echo "Archive: ${unslashed}.tar (Directory ${unslashed})"
 	echo "Compress: $preferred $params ${unslashed}.tar"
