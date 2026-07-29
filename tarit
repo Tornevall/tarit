@@ -1,9 +1,34 @@
 #!/bin/sh
 
-# TarIT version 1.0.4
+# TarIT version 1.0.5
 # Tomas Tornevall - thorne@tornevall.net
 # https://bitbucket.tornevall.net/projects/MISC/repos/tarit/browse
 #
+
+usage()
+{
+	echo "Usage: tarit <directory|archive>"
+	echo
+	echo "  directory  Create directory.tar.<xz|bz2|gz> and remove the"
+	echo "             source directory after successful compression."
+	echo "  archive    Repack a .zip, .rar, .tgz, .txz, .tbz, .tbz2 or"
+	echo "             .tar file as .tar.<xz|bz2|gz> and remove the source"
+	echo "             archive after successful compression."
+	echo
+	echo "The best available compressor is selected in this order: xz, bzip2, gzip."
+	echo "Use tarit -h or tarit --help to show this help."
+}
+
+case "$1" in
+	-h|--help)
+		usage
+		exit 0
+		;;
+	"")
+		usage
+		exit 1
+		;;
+esac
 
 xz=`which xz`
 bz=`which bzip2`
@@ -26,7 +51,7 @@ extension="gz"
 fi
 
 urar="x"
-xuzip="-d ."
+uzip="-d ."
 utgz="zvxf"
 utxz="Jvxf"
 ubz2="jvxf"
@@ -39,11 +64,6 @@ if [ "" = "$preferred" ] ; then
 	exit
 fi
 
-
-if [ "" = "$1" ] ; then
-	echo "Usage: tarit directory"
-	exit
-fi
 
 unslashed=$1
 slashed=`echo $1 | grep "/"`
@@ -58,6 +78,7 @@ echo "Selected archiver: $preferred (Params: $params)"
 
 if [ -d "$unslashed" ] ; then
 	packed="${unslashed}.tar.$extension"
+	echo "Mode: archive directory (the source directory is removed after success)"
 	echo "Archive: ${unslashed}.tar (Directory ${unslashed})"
 	echo "Compress: $preferred $params ${unslashed}.tar"
 
@@ -104,6 +125,7 @@ else
 				fi
 				currentExtension=$testExtension
 				filePacker=`which $testPacker`
+				echo "Mode: repack archive (the source archive is removed after success)"
 				echo "$unslashed format is $testExtension, archiver set to $filePacker"
 			fi
 		done
